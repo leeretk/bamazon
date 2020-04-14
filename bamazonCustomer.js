@@ -1,16 +1,18 @@
 
 //Set Variables
-var mysql = require("mysql");
 require("dotenv").config();
+var fs = require("fs");
+var keys = require("./keys.js");
+var inquirer = require("inquirer");
+var mysql = require("mysql");
 
-console.log(keys.mysql)
+var Mysql = new Mysql(keys.SQL);
 
-var sql_key = new SQL(keys.SQL);
-
+console.log(keys.SQL)
 
 //vars to capture input process.argv
-var userQry = process.argv[2];
-var qryParameter = process.argv.slice(3).join(" ")
+var itemNumber = process.argv[2];
+var orderQty = process.argv.slice(3).join(" ")
 
 // Run the test and log it to console immediately
 console.log(process.argv[2] === process.argv[3]);
@@ -66,10 +68,10 @@ connection.connect(function(err) {
 var orderQty = 0
 var sohQty = 0
 
-    // 0 STOCK ON HAND  --> "INSIFFICIENT QUANITITY"  
-            PROMPT (WOULD YOU LIKE TO PICK ANOTHER ITEM?)
-            //IF YES --> 
-                PROMPT (Q1 and Q2)
+    // // 0 STOCK ON HAND  --> "INSIFFICIENT QUANITITY"  
+    //         PROMPT (WOULD YOU LIKE TO PICK ANOTHER ITEM?)
+    //         //IF YES --> 
+    //             PROMPT (Q1 and Q2)
             //IF ELSE --> (UNITS OF PURCHASE - CURRENT STOCK ON HAND) = X   
                 
                 this.check 

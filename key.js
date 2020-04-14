@@ -1,6 +1,6 @@
 console.log('this is loaded');
 
-exports.sql_db = {
+exports.SQL = {
   id: process.env.USERSECRET,
   secret: process.env.PWSECRET
 };
