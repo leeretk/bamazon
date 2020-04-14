@@ -1,4 +1,35 @@
 
+//Set Variables
+var mysql = require("mysql");
+
+console.log(keys.mysql)
+
+
+var spotifyQry = new Spotify(keys.spotify);
+
+//vars to capture input process.argv
+var userQry = process.argv[2];
+var qryParameter = process.argv.slice(3).join(" ")
+
+// Run the test and log it to console immediately
+console.log(process.argv[2] === process.argv[3]);
+console.log(process.argv[2] % 7 === 0 && process.argv[3] % 7 === 0);
+
+var connection = mysql.createConnection({
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: "M00dle99!",
+    database: "mysongs_db",
+});
+console.log("I am at point 1!");
+
+connection.connect(function(err) {
+  if (err) throw err;
+  console.log("connected as id " + connection.threadId + "\n");
+  newSong();
+});
+
 
 
 //display all of the items available for sale. 
@@ -69,4 +100,4 @@ var sohQty = 0
                                 }
 
                         }
-                             
+                            
