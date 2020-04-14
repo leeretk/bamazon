@@ -1,11 +1,12 @@
 
 //Set Variables
 var mysql = require("mysql");
+require("dotenv").config();
 
 console.log(keys.mysql)
 
+var sql_key = new SQL(keys.SQL);
 
-var spotifyQry = new Spotify(keys.spotify);
 
 //vars to capture input process.argv
 var userQry = process.argv[2];
@@ -19,8 +20,8 @@ var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "M00dle99!",
-    database: "mysongs_db",
+    password: "",
+    database: "bamazon",
 });
 console.log("I am at point 1!");
 
@@ -42,6 +43,19 @@ connection.connect(function(err) {
 // Q-2 How many units would you like to buy?
 
 ///customer places order////
+
+// validateInput makes sure that the user is supplying only positive integers for their inputs
+        function validateInput(value) {
+            var integer = Number.isInteger(parseFloat(value));
+            var sign = Math.sign(value);
+
+            if (integer && (sign === 1)) {
+                return true;
+            } else {
+                return 'Please enter a whole non-zero number.';
+            }
+        }
+
 
 
 ///check inventory 
