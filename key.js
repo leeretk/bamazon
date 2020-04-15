@@ -1,6 +1,6 @@
-console.log('this is loaded');
+console.log('login is loaded');
 
-exports.SQL = {
-  id: process.env.USERSECRET,
-  secret: process.env.PWSECRET
+exports.mysql = {
+  user: process.env.USERSECRET,
+  password: process.env.PWSECRET
 };
