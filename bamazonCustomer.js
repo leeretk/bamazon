@@ -11,13 +11,18 @@ var connection = mysql.createConnection({
     password: process.env.PWSECRET,
     database: "bamazon",
 });
-
 connection.connect(function(err) {
-    if (err) throw err;
-    console.log("connected as id " + connection.threadId + "\n");
-  });
+  if (err) {
+    console.error('error connecting: ' + err.stack);
+    return;
+  }
+ 
+  console.log('connected as id ' + connection.threadId);
+});
+ 
 
   /////////////////////// do not touch //////////////
 
 // require("console.table");
+
 
