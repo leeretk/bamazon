@@ -23,6 +23,6 @@ connection.connect(function(err) {
 
   /////////////////////// do not touch //////////////
 
-// require("console.table");
+
 
 
