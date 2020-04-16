@@ -5,7 +5,6 @@ require("dotenv").config();
 var mysql = require('mysql');
 var chalk = require("chalk");
 
-
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -18,8 +17,8 @@ connection.connect(function(err) {
     console.error('error connecting: ' + err.stack);
     return;
   }
-  showAllProducts();
   console.log('connected as id ' + connection.threadId);
+  showAllProducts();
 });
  
 //display all of the items available for sale. 
@@ -29,14 +28,19 @@ connection.connect(function(err) {
     var query = connection.query("SELECT * FROM products", function(err, res) {
       if (err) throw err;
       for (var i = 0; i < res.length; i++) {
-        console.log(chalk.green(res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " + res[i].price + " | " + res[i].stock_quantity));
+        console.log(chalk.green(
+          res[i].item_id + " | " 
+        + res[i].product_name + " | " 
+        + res[i].department_name + " | " 
+        + res[i].price + " | " 
+        + res[i].stock_quantity));
       }
     });
   
     // logs the actual query being run
     console.log(query.sql);
-    prompt();
     connection.end();
+    prompt();
   }
   ///////***///////////***///// do not touch ///////***///////***///////***///////***///////***///////***
 
@@ -60,31 +64,30 @@ function prompt() {
       }
     ]).then(function (inquirerResponse) {
       if (inquirerResponse.bamazonSearch === "item-id") {
-        console.log("\nChoice: " + inquirerResponse.bamazonSearch);
+        console.log("\nItem-id Response: " + inquirerResponse.bamazonSearch);
   
         inquirer.prompt([
           {
             type: "input",
             name: "searchItemId",
-            message: "What item would you like to purchase?"
+            message: "Search by Item ID"
           }
-        ]).then(function (itemResponse) {
-          console.log("\nSong Response: " + itemResponse.searchItemId);
-          showSpotifyInfo(itemResponse.searchItemId);
+        ]).then(function (itemIDResponse) {
+          console.log("\nItem ID Response: " + itemIDResponse.searchItemId);
+          showAllProducts(itemIDResponse.searchItemId);
         })
       } else if (inquirerResponse.bamazonSearch === "item-name") {
-        console.log("\nChoice: " + inquirerResponse.bamazonSearch);
+        console.log("\nItem Name Response: " + inquirerResponse.bamazonSearch);
   
-
         inquirer.prompt([
           {
             type: "input",
             name: "searchItemName",
-            message: "What item would you like to purchase?"
+            message: "Search by Item Name"
           }
-        ]).then(function (movieResponse) {
-          console.log("\nMovie Response: " + movieResponse.searchItemName);
-          showMovieInfo(movieResponse.searchItemName);
+        ]).then(function (itemNameResponse) {
+          console.log("\nItem Name Response: " + itemNameResponse.searchItemName);
+          showAllProducts(itemNameResponse.searchItemName);
         })
       } else if (inquirerResponse.bamazonSearch === "department-name") {
         console.log("\nChoice: " + inquirerResponse.bamazonSearch);
@@ -93,11 +96,11 @@ function prompt() {
           {
             type: "input",
             name: "searchDept",
-            message: "What item would you like to purchase?"
+            message: "Search by Department"
           }
-        ]).then(function (concertResponse) {
-          console.log("\nConcert Response: " + concertResponse.searchDept);
-          showConcertInfo(concertResponse.searchDept);
+        ]).then(function (departmentResponse) {
+          console.log("\nDepartment Response: " + departmentResponse.searchDept);
+          showAllProducts(departmentResponse.searchDept);
         })
       } else if (inquirerResponse.bamazonSearchChoices === "do-what-it-says") {
       } else {
@@ -133,69 +136,69 @@ function prompt() {
 
 
 
-/pick an item
+// /pick an item
 
-function requestItem() {
-
-
-}
-
-/check inventory 
+// function requestItem() {
 
 
-//INSUFFICENT QTY IF --> 
+// }
 
-var orderQty = 0
-var sohQty = 0
+// /check inventory 
+
+
+// //INSUFFICENT QTY IF --> 
+
+// var orderQty = 0
+// var sohQty = 0
 
     // // 0 STOCK ON HAND  --> "INSIFFICIENT QUANITITY"  
     //         PROMPT (WOULD YOU LIKE TO PICK ANOTHER ITEM?)
     //         //IF YES --> 
-    //             PROMPT (Q1 and Q2)
-            //IF ELSE --> (UNITS OF PURCHASE - CURRENT STOCK ON HAND) = X   
+    // //             PROMPT (Q1 and Q2)
+    //         //IF ELSE --> (UNITS OF PURCHASE - CURRENT STOCK ON HAND) = X   
                 
-                this.check 
+    //             this.check 
 
-                    function checkStock(){
+    //                 function checkStock(){
 
-                        var x = (orderQty-sohQty)  // the (outcome of order qty - soh qty)
+    //                     var x = (orderQty-sohQty)  // the (outcome of order qty - soh qty)
 
-                        if (x > sohQty || sohQty === x) {
+    //                     if (x > sohQty || sohQty === x) {
                         
-                            console.log("Your order has been placed")
-                            updateStockQty(); // deduct order qty from stock on hand and update database record with new SOH Qty.
-                            prompt(); // would you like to place another order.
+    //                         console.log("Your order has been placed")
+    //                         updateStockQty(); // deduct order qty from stock on hand and update database record with new SOH Qty.
+    //                         prompt(); // would you like to place another order.
     
-                        } else if (x < 0) {
-                            console.log("We no longer have that item in stock")
-                            prompt(); // would you like to place another order.
+    //                     } else if (x < 0) {
+    //                         console.log("We no longer have that item in stock")
+    //                         prompt(); // would you like to place another order.
 
-                                yes 
+    //                             yes 
 
-                                if (x = )
+    //                             if (x = )
     
-                                    prompt(would you like to purchase 3 instead?)
+    //                                 prompt(would you like to purchase 3 instead?)
 
-                                    IF YES -->  
+    //                                 IF YES -->  
 
-                                        console.log("Your order has been placed")
-                                        prompt(); // would you like to place another order.   
-                                        updateStockQty(); // deduct order qty from stock on hand and update database record with new SOH Qty.
+    //                                     console.log("Your order has been placed")
+    //                                     prompt(); // would you like to place another order.   
+    //                                     updateStockQty(); // deduct order qty from stock on hand and update database record with new SOH Qty.
                 
 
 
-                                    UPDATE 
+    //                                 UPDATE 
     
-                            ELSE IF -->
-                                        console.log("We no longer have that item in stock")
+    //                         ELSE IF -->
+    //                                     console.log("We no longer have that item in stock")
 
-                                         updateStockQty(); // deduct order qty from stock on hand and update database record with new SOH Qty.
+    //                                      updateStockQty(); // deduct order qty from stock on hand and update database record with new SOH Qty.
 
-                                else if {
+    //                             else if {
 
-                                }
+    //                             }
 
-                        }
+    //                     }
                             
 
 
