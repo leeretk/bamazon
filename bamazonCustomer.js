@@ -1,9 +1,17 @@
 var fs = require("fs");
 var inquirer = require("inquirer");
 require("dotenv").config();
-var mysql = require('mysql');
+var mysql = require("mysql");
 var chalk = require("chalk");
-// var table = require("text-table");
+//var table = require("text-table");
+
+
+var formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: "USD",
+  minimumFractionDigits: 2
+})
+
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -12,250 +20,142 @@ var connection = mysql.createConnection({
   password: process.env.secret,
   database: "bamazon",
 });
+
 connection.connect(function (err) {
   if (err) {
-    console.error('error connecting: ' + err.stack);
+    console.error(chalk.magenta('ERROR CONNECTING: ' + err.stack));
     return;
   }
-  console.log('connected as id ' + connection.threadId);
-  showAllProducts();
+  console.log(chalk.yellow('YOU ARE CONNECTED: ' + connection.threadId));
+  displayItemInventory();
 });
 
 //display all of the items available for sale. 
-// ID | PRODUCT  NAME | PRICE | STOCK ON HAND
+function displayItemInventory() {
+  var queryProducts = connection.query("SELECT * FROM products",
 
-function showAllProducts() {
-  var query = connection.query("SELECT * FROM products", function (err, res) {
-    if (err) throw err;
-    for (var i = 0; i < res.length; i++) {
+    function (err, res) {
+      console.log(chalk.green('\n'+"ID | PRODUCT NAME | DEPARTMENT | PRICE | STOCK ON HAND"));
 
-      console.log(chalk.green(
-        res[i].item_id + " | "
-        + res[i].product_name + " | "
-        + res[i].department_name + " | "
-        + res[i].price + " | "
-        + res[i].stock_quantity));
-    }
-  });
-  // logs the actual query being run
-  console.log(query.sql);
-  connection.end();
+      if (err) throw err;
+      for (var i = 0; i < res.length; i++) {
+        console.log(chalk.green(
+          res[i].item_id + " | "
+          + res[i].product_name + " | "
+          + res[i].department_name + " | "
+          + formatter.format(res[i].price) + " | "
+          + res[i].stock_quantity));
+      }
+      promptOrderItem();
+    });
+  //logs the actual query being run
+  //console.log("bamazon database query: " + queryProducts.sql + '\n');
 }
-prompt();
-///////***///////////***///// do not touch ///////***///////***///////***///////***///////***///////***
-///////***///////////***///// do not touch ///////***///////***///////***///////***///////***///////***
-///////***///////////***///// do not touch ///////***///////***///////***///////***///////***///////***
 
-//**************Create a "Prompt" with a series of questions*****************//
-function prompt() {
-
-  inquirer.prompt([
-    {
-      type: "list",
-      name: "bamazonSearch",
-      message: "How would you like to Search?",
-      choices: [
-        "item-id",
-        "item-name",
-        "item-dept-name",
-        "exit",
-      ]
-    }
-  ]).then(function (inquirerResponse) {
-    if (inquirerResponse.bamazonSearch === "item-id") {
-      console.log("\nItem-id Response: " + inquirerResponse.bamazonSearch);
-
-      inquirer.prompt([
-        {
-          type: "input",
-          name: "searchItemId",
-          message: "Search by Item ID"
-        }
-      ]).then(function (itemIDResponse) {
-        console.log("\nItem ID Response: " + itemIDResponse.searchItemId);
-        showAllProducts(itemIDResponse.searchItemId);
-      })
-    } 
-    
-        
-    else if (inquirerResponse.bamazonSearch === "item-name") {
-      console.log("\nItem Name Response: " + inquirerResponse.bamazonSearch);
-
-      inquirer.prompt([
-        {
-          type: "input",
-          name: "searchItemName",
-          message: "Search by Item Name"
-        }
-      ]).then(function (itemNameResponse) {
-        console.log("\nItem Name Response: " + itemNameResponse.searchItemName);
-        showAllProducts(itemNameResponse.searchItemName);
-      })
-    }  
-    
-    else if (inquirerResponse.bamazonSearch === "department-name") {
-      console.log("\nDepartment Response: " + inquirerResponse.bamazonSearch);
-
-      inquirer.prompt([
-        {
-          type: "input",
-          name: "searchDept",
-          message: "Search by Department"
-        }
-      ]).then(function (departmentResponse) {
-        console.log("\nDepartment Response: " + departmentResponse.searchDept);
-        showAllProducts(departmentResponse.searchDept);
-      })
-    } 
-   
-    
-    else {
-      console.log("all set")
-      process.exit();
-    }
-  }
-  );
-}
-prompt();
-
-//prompt 
-
+//**************Create a "Prompt" with a series of questions
 // Q-1 What is the product ID of the item you want to buy?
+// Q-2 How many units would you like to buy?*****************//
+function promptOrderItem() {
+	
+	inquirer.prompt([
+		{
+			type: 'input',
+			name: 'item_id',
+			message: 'What is the product ID of the item you want to buy?',
+			validate: validateInput,  //make sure item is not negative.
+			filter: Number
+		},
+		{
+			type: 'input',
+			name: 'quantity',
+			message: 'How many units would you like to buy?',
+			validate: validateInput, //make sure item is not negative.
+			filter: Number
+		}
+	]).then(function(input) {
+    // console.log('\n'
+    //     + 'Item and Quantity selected:\n' 
+    //     + 'item_id = '  + input.item_id +  '\n'
+    //     + 'quantity = ' + input.quantity + '\n');
 
-// Q-2 How many units would you like to buy?
+		var item = input.item_id;
+    var quantity = input.quantity;
+    
+		var queryData = 'SELECT * FROM products WHERE ?';
 
-///customer places order////
+		connection.query(queryData, {item_id: item}, function(err, data) {
+      if (err) throw err;
+      
+        //console.log('data = ' + JSON.stringify(data));
 
-// validateInput makes sure that the user is supplying only positive integers for their inputs
-function validateInput(value) {
-  var integer = Number.isInteger(parseFloat(value));
-  var sign = Math.sign(value);
+			if (data.length === 0) {
+				console.log(chalk.bgMagenta('ERROR: Invalid Item ID. Please select another Item.'));
+				displayItemInventory();
 
-  if (integer && (sign === 1)) {
-    return true;
-  } else {
-    return 'Please enter a whole non-zero number.';
-  }
+      } else {
+        
+				var orderData = data[0];
+
+        //console.log('\n' + 'orderData = ' + JSON.stringify(orderData));
+        
+          
+				// QUANTITY IN STOCK?
+				if (quantity <= orderData.stock_quantity) {
+
+
+					console.log(chalk.yellow('\n'+'****Item is available, your order is being processed!****' + '\n'));
+
+					// Construct the updating query string
+          var updateInventoryQueryData = 'UPDATE products SET stock_quantity = ' + (orderData.stock_quantity - quantity) + ' WHERE item_id = ' + item;
+          
+					// console.log('\n'+'updateInventoryQueryData = ' + updateInventoryQueryData);
+
+					//UPDATE INVENTORY
+					connection.query(updateInventoryQueryData, function(err, data) {
+						if (err) throw err;
+
+            console.log(chalk.yellow("\n---------------------------ORDER DATA------------------------------------------\n"));
+
+            console.log(chalk.green(
+              '\n' + 'Item Id: ' + orderData.item_id + '  Product Name: ' + orderData.product_name + '  Stock on Hand: ' + orderData.stock_quantity
+            + '\n' + 'Item Price: ' + formatter.format(orderData.price)
+            + '\n' + 'Order Quantity: ' + input.quantity
+            + '\n' + '******************************' 
+            + '\n' + 'ORDER TOTAL: ' + formatter.format(orderData.price * quantity)
+            + '\n' + '******************************' 
+            ));
+
+						console.log(chalk.yellow('\n'+'Your order has been placed! Thank you for shopping with bamazon!'));
+            console.log(chalk.yellow("\n----------------------------ORDER COMPLETE------------------------------------\n"));
+
+						// End the database connection
+						connection.end();
+					})
+				} else {
+					console.log(chalk.bgMagenta('Sorry, there is not enough product in stock, would you like to purchase something else?'));
+					console.log(chalk.bgMagenta('Please select another item.'));
+					console.log("\n-----------------------------------------------------------------------------------\n");
+
+					displayItemInventory();
+				}
+			}
+		})
+	})
 }
 
-    //     var t=table ([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price,  
-    //       res[i].stock_quantity]);
+// Validate Order Input to ensure only positive integers are entered
+function validateInput(value) {
+	var integer = Number.isInteger(parseFloat(value));
+	var sign = Math.sign(value);
 
-    // consol.log(t)
+	if (integer && (sign === 1)) {
+		return true;
+	} else {
+		return 'Must enter a non-negative number. Please try again.';
+	}
+}
 
-
-// /pick an item
-
-// function requestItem() {
-
-
-// }
-
-// /check inventory 
-
-
-// //INSUFFICENT QTY IF --> 
-
-// var orderQty = 0
-// var sohQty = 0
-
-    // // 0 STOCK ON HAND  --> "INSIFFICIENT QUANITITY"  
-    //         PROMPT (WOULD YOU LIKE TO PICK ANOTHER ITEM?)
-    //         //IF YES --> 
-    // //             PROMPT (Q1 and Q2)
-    //         //IF ELSE --> (UNITS OF PURCHASE - CURRENT STOCK ON HAND) = X   
-
-    //             this.check 
-
-    //                 function checkStock(){
-
-    //                     var x = (orderQty-sohQty)  // the (outcome of order qty - soh qty)
-
-    //                     if (x > sohQty || sohQty === x) {
-
-    //                         console.log("Your order has been placed")
-    //                         updateStockQty(); // deduct order qty from stock on hand and update database record with new SOH Qty.
-    //                         prompt(); // would you like to place another order.
-
-    //                     } else if (x < 0) {
-    //                         console.log("We no longer have that item in stock")
-    //                         prompt(); // would you like to place another order.
-
-    //                             yes 
-
-    //                             if (x = )
-
-    //                                 prompt(would you like to purchase 3 instead?)
-
-    //                                 IF YES -->  
-
-    //                                     console.log("Your order has been placed")
-    //                                     prompt(); // would you like to place another order.   
-    //                                     updateStockQty(); // deduct order qty from stock on hand and update database record with new SOH Qty.
-
-
-
-    //                                 UPDATE 
-
-    //                         ELSE IF -->
-    //                                     console.log("We no longer have that item in stock")
-
-    //                                      updateStockQty(); // deduct order qty from stock on hand and update database record with new SOH Qty.
-
-    //                             else if {
-
-    //                             }
-
-    //                     }
-
-
-
-  // function updateProduct() {
-  //   console.log("Updating all Rocky Road quantities...\n");
-  //   var query = connection.query(
-  //     "UPDATE products SET ? WHERE ?",
-  //     [
-  //       {
-  //         quantity: 100
-  //       },
-  //       {
-  //         flavor: "Rocky Road"
-  //       }
-  //     ],
-  //     function(err, res) {
-  //       if (err) throw err;
-  //       console.log(res.affectedRows + " products updated!\n");
-  //       // Call deleteProduct AFTER the UPDATE completes
-  //       deleteProduct();
-  //     }
-  //   );
-  //   // logs the actual query being run
-  //   console.log(query.sql);
-  // }
-
-  // function deleteProduct() {
-  //   console.log("Deleting all strawberry icecream...\n");
-  //   connection.query(
-  //     "DELETE FROM products WHERE ?",
-  //     {
-  //       flavor: "strawberry"
-  //     },
-  //     function(err, res) {
-  //       if (err) throw err;
-  //       console.log(res.affectedRows + " products deleted!\n");
-  //       // Call readProducts AFTER the DELETE completes
-  //       readProducts();
-  //     }
-  //   );
-  // }
-
-  // function readProducts() {
-  //   console.log("Selecting all products...\n");
-  //   connection.query("SELECT * FROM products", function(err, res) {
-  //     if (err) throw err;
-  //     // Log all results of the SELECT statement
-  //     console.log(res);
-  //     connection.end();
-  //   });
-  // }
+///////***///////////***///// do not touch ///////***///////***///////***///////***///////***///////***
+///////***///////////***///// do not touch ///////***///////***///////***///////***///////***///////***
+///////***///////////***///// do not touch ///////***///////***///////***///////***///////***///////***
 
