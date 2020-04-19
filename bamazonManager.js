@@ -120,8 +120,7 @@ function validateInput(value) {
       return 'Must enter a non-negative number. Please try again.';
     }
 };
- 
-//ADD STOCK QUANTITY TO INVENTORY ITEM (working)
+ //ADD STOCK QUANTITY TO INVENTORY ITEM (working)
 function addItemSOH() {
     inquirer.prompt([
             {
@@ -172,9 +171,7 @@ function addItemSOH() {
             });
         });
 };
-    
-
-//ADD NEW ITEM TO PRODUCT LIST
+//ADD NEW ITEM TO PRODUCT LIST (working)
 function addNewItem() {
     inquirer.prompt([
         {
@@ -211,18 +208,15 @@ function addNewItem() {
                 + 'STOCK QTY:      ' + input.stock_quantity +'\n'
         ));
         //INSERT INPUT INTO SQL DATABASE & THEN SHOW FULL LIST RESULTS
-
-    // var addNewInventoryItem = connection.query(
-    //     'INSERT INTO products (product_name,department_name,price,stock_quantity) VALUES (input.product_name, input.department_name, input.price, input.stock_quantity)');
-
-
-        //logs the actual query being run
-            console.log("product list query: " + addNewInventoryItem.sql + '\n');
+        var addNewInventoryItem = 'INSERT INTO products SET ?';
+    
+        connection.query(addNewInventoryItem, input, 
+             function(err, res, fields) {
+                    if (err) throw err;    
+    
+        console.log('New product ID: ' + res.insertId + '.');
+                console.log("\n---------------------------------------------------------------------\n");
+        promptManagerAction();
     });
-
-};
-
-            
-console.log('END SESSION');
-connection.end();
-
+})};
+        
