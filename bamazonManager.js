@@ -121,7 +121,7 @@ function validateInput(value) {
     }
 };
  
-//ADD STOCK QUANTITY TO INVENTORY ITEM
+//ADD STOCK QUANTITY TO INVENTORY ITEM (working)
 function addItemSOH() {
     inquirer.prompt([
             {
@@ -137,39 +137,28 @@ function addItemSOH() {
                 message: 'How many units would you like to add to inventory?',
                 validate: validateInput, //make sure item is not negative.
                 filter: Number
-            }
-     
-    ])
-    .then(function (input) {
-        
+            }     
+    ]).then(function (input) {
         var item = input.item_id;
         var inputQuantity = input.quantity;
-        
         var queryData = 'SELECT * FROM products WHERE ?';
-
         connection.query(queryData, { item_id: item }, function (err, data) 
             {
                 if (err) throw err;
                 //console.log('data = ' + JSON.stringify(data));
-
                 if (data.length === 0) {
-
                     console.log(chalk.bgMagenta('ERROR: Invalid Item ID. Please select another Item.'));
                     displayItemInventory();
                 } else 
                     {
                         var quantityData = data[0];
-
-                        console.log('\n' + 'updating stock quantity...' + JSON.stringify(quantityData));
-
+                        // console.log('\n' + 'updating stock quantity...' + JSON.stringify(quantityData));
+                        console.log('\n' + 'updating stock quantity...');
                         //CONSTRUCT THE QUERY TO UPDATE THE INVENTORY 
-
                         var addItemStock = connection.query(
                             'UPDATE products SET stock_quantity='
                             + (quantityData.stock_quantity + inputQuantity)
                             + ' WHERE item_id = ' + item);
-
-                        //logs the actual query being run
                         console.log(chalk.blue(
                             '\n' 
                             + 'PREVIOUS STOCK ON HAND QTY:  ' + quantityData.stock_quantity  + '\n'
@@ -177,7 +166,7 @@ function addItemSOH() {
                             + '_______________________________' + '\n'
                             + 'NEW STOCK ON HAND QTY:  ' + (quantityData.stock_quantity + inputQuantity) + '\n'
                             ));
-                        console.log("product list query: " + addItemStock.sql + '\n');
+                        // console.log("product list query: " + addItemStock.sql + '\n');
                     }
                     promptManagerAction(); 
             });
@@ -185,16 +174,55 @@ function addItemSOH() {
 };
     
 
-
 //ADD NEW ITEM TO PRODUCT LIST
 function addNewItem() {
-    var addNewInventoryItem = connection.query(
-        'INSERT INTO products (product_name,department_name,price,stock_quantity) VALUES (input.product_name, input.department_name, input.price, input.stock_quantity)'); 
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'product_name',
+            message: 'Product Name?',
+        },
+        {
+            type: 'input',
+            name: 'department_name',
+            message: 'Department Name?',
+        },   
+        {
+            type: 'input',
+            name: 'price',
+            message: 'What is the price per unit?',
+            validate: validateInput,
+        },   
+        {
+            type: 'input',
+            name: 'stock_quantity',
+            message: 'Starting Stock on Hand?',
+            validate: validateInput,
+        }   
+    ]).then(function(input) {
+        //SHOW INPUT FROM PROMPT
+        console.log(chalk.blue(
+                '\n' 
+                + 'ITEM INPUT:     '
+                + 'ITEM ID:        ' + input.itemID + '\n'
+                + 'PRODUCT NAME:   ' + input.product_name  + '\n'
+                + 'DEPARTMENT NAME:' + input.department_name + '\n'
+                + 'PRICE:          ' + formatter.format(input.price) + '\n'
+                + 'STOCK QTY:      ' + input.stock_quantity +'\n'
+        ));
+        //INSERT INPUT INTO SQL DATABASE & THEN SHOW FULL LIST RESULTS
 
-    var itemID = res.resultID
-    console.log(itemID)
-    //logs the actual query being run
-    console.log("product list query: " + addNewInventoryItem.sql + '\n');
-    connection.end();
+    // var addNewInventoryItem = connection.query(
+    //     'INSERT INTO products (product_name,department_name,price,stock_quantity) VALUES (input.product_name, input.department_name, input.price, input.stock_quantity)');
+
+
+        //logs the actual query being run
+            console.log("product list query: " + addNewInventoryItem.sql + '\n');
+    });
+
 };
+
+            
+console.log('END SESSION');
+connection.end();
 
