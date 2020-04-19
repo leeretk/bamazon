@@ -14,6 +14,8 @@ CREATE TABLE products (
     ,primary key(item_id)
 );
 
+ALTER TABLE products ADD product_sales decimal(5,2);
+
 INSERT INTO products (product_name,department_name,price,stock_quantity)
 	VALUES 
      ('hotwheels', 'toys','2', '20000000')
