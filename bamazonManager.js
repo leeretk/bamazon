@@ -104,9 +104,7 @@ function displayItemInventory() {
 
 //VIEW LOW INVENTORY LIST
 function displayLowInventory() {
-    if (qryParameter === "") {
-        // qryParameter = enter default value here//
-    }
+  console.log('___ENTER displayLowInventory___');
 
     var queryLowInventoryList = connection.query("SELECT * FROM products WHERE stock_quantity < 5",
   
