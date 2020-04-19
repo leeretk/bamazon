@@ -33,7 +33,7 @@ function promptManagerAction() {
         {
             type: 'list',
             name: 'option',
-            choices: ['view-products-for-sale', 'view-low-inventory', 'add-to-inventory', 'add-new-product'],
+            choices: ['view-products-for-sale', 'view-low-inventory', 'add-to-inventory', 'add-new-product','exit'],
             filter: function (selection) {
                 if (selection === 'view-products-for-sale') {
                     return 'inventoryList';
@@ -45,8 +45,13 @@ function promptManagerAction() {
 
                 } else if (selection === 'add-new-product') {
                     return 'addItem';
-                } else {
-                    console.log('ERROR: Operation Not Supported');
+
+                } else if (selection === 'exit') {
+                    return 'exitProgram';
+                } 
+                              
+                else {
+                   console.log('ERROR: Operation Not Supported');
                     exit(1);
                 }
             }
@@ -64,7 +69,11 @@ function promptManagerAction() {
 
             } else if (input.option === 'addItem') {
                  addNewItem();
-            } else {
+            } 
+            else if (input.option === 'exitProgram') {
+                endProgram();
+           }           
+            else {
                 console.log('ERROR: Operation Not Supported');
                 exit(1);
             }
@@ -220,3 +229,7 @@ function addNewItem() {
     });
 })};
         
+function endProgram() {
+    console.log('*******SESSION ENDED******')
+    connection.end();
+};
