@@ -24,41 +24,64 @@ connection.connect(function (err) {
     console.error(chalk.magenta('ERROR CONNECTING: ' + err.stack));
     return;
   }
+  
   console.log(chalk.yellow('YOU ARE CONNECTED: ' + connection.threadId));
+  promptManagerAction()
 });
 
 //Execute switch function to query database lists 
-var userQry = process.argv[2];
-var qryParameter = process.argv.slice(3).join(" ")
 
-UserQuery(userQry, qryParameter);
+function promptManagerAction() {
+    console.log('__________ENTER  promptManagerAction_______');
 
-function UserQuery(userQry, qryParameter) {
-    switch (userQry) {
-      case 'view-products-for-sale':
-        displayItemInventory(qryParameter);
-        break;
-      case 'view-low-inventory':
-        displayLowInventory(qryParameter);
-        break;
-      case 'add-to-inventory':
-        addItemSOH(qryParameter);
-        break;
-      case 'add-new-product':
-        addNewItem(qryParameter);
-        break;
-    }
-  };
+    //prompt for selection
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'option',
+            choices: ['view-products-for-sale', 'view-low-inventory', 'add-to-inventory', 'add-new-product'],
+            filter: function (selection) {
+                if (selection === 'view-products-for-sale') {
+                    return 'inventoryList';
+                } else if (selection === 'view-low-inventory') {
+                    return 'lowInventoryList';
 
-  
+                } else if (selection === 'add-to-inventory') {
+                    return 'addStock';
+
+                } else if (selection === 'add-new-product') {
+                    return 'addItem';
+                } else {
+                    console.log('ERROR: Operation Not Supported');
+                    exit(1);
+                }
+            }
+        }
+    ]).then(function(input) {
+        console.log('user selected: ' + JSON.stringify(input));
+
+        if (input.option === 'inventoryList') {
+                displayItemInventory();
+            } else if (input.option === 'lowInventoryList') {
+                 displayLowInventory();
+
+            } else if (input.option === 'addStock') {
+                addItemSOH();
+
+            } else if (input.option === 'addItem') {
+                 addNewItem();
+            } else {
+                console.log('ERROR: Operation Not Supported');
+                exit(1);
+            }
+    });
+}
 
 
+//VIEW PRODUCTS FOR SALE (working)
+function displayItemInventory() {
+  console.log('___ENTER displayItemInventory___');
 
-//VIEW PRODUCTS FOR SALE 
-function displayItemInventory(qryParameter) {
-    if (qryParameter === "") {
-        // qryParameter = enter default value here//
-      }
     var queryProductList = connection.query("SELECT * FROM products",
   
       function (err, res) {
@@ -74,10 +97,10 @@ function displayItemInventory(qryParameter) {
             + formatter.format(res[i].price) + " | "
             + res[i].stock_quantity));
         }
-      });
-    //logs the actual query being run
+    });
     console.log("product list query: " + queryProductList.sql + '\n');
-  }
+    promptManagerAction(); 
+}
 
 //VIEW LOW INVENTORY LIST
 function displayLowInventory() {
