@@ -1,8 +1,10 @@
-# BAMAZON CUSTOMER ORDER CENTER
+# BAMAZON
 
 BAMAZON is an online ordering center.  
 
-## Initialize Application
+## BAMAZON CUSTOMER ORDER CENTER
+
+### Initialize Application
 
 1) Items availbe for order appear
 2) Question appears asking customer to select an item_id
@@ -10,16 +12,16 @@ BAMAZON is an online ordering center.
 
 {insert picture from Node}
 
-## Enter Order Information
+### Enter Order Information
 
 {insert picture from Node}
 
-## Validate Order Information
+### Validate Order Information
 
 Validation occurs when the item ID and the order quantity are entered.  Validate ensures the number entered is a positive integeter.
-Validate also checks to make sure the item ID entered is availabe. 
+Validate also checks to make sure the item ID entered is availabe.
 
-When an item is entered incorrectly the following messages appear. 
+When an item is entered incorrectly the following messages appear.
 
 Invalid Item ID:
 {insert picture from Node}
@@ -30,25 +32,12 @@ Invalid Quantity:
 Unavailable Stock Qty:
 {insert picture from Node}
 
-## Decrement Inventory
+### Decrement Inventory
 
-Here the program will deduct the order quantity from the stock on hand quantity and show the new quantity on hand. 
+Here the program will deduct the order quantity from the stock on hand quantity and show the new quantity on hand.
 
+### Would you like to place another order
 
+## BAMAZON INVENTORY MANAGER
 
-
-
-## Would you like to place another order
-
-
-
-
-# BAMAZON INVENTORY MANAGER
-
-
-
-
-
-
-# BAMAZON SUPERVISOR
-
+## BAMAZON SUPERVISOR
