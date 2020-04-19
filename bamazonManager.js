@@ -25,14 +25,13 @@ connection.connect(function (err) {
     return;
   }
   
-  console.log(chalk.yellow('YOU ARE CONNECTED: ' + connection.threadId));
+  console.log(chalk.yellow('YOU ARE CONNECTED: ' + connection.threadId +'\n'));
   promptManagerAction()
 });
 
-//Execute switch function to query database lists 
-
+//SWITCH PROMPTS (working)
 function promptManagerAction() {
-    console.log('__________ENTER  promptManagerAction_______');
+    console.log(chalk.yellow('USE ARROWS TO SELECT A MANAGER ACTION'+'\n'));
 
     //prompt for selection
     inquirer.prompt([
@@ -77,19 +76,14 @@ function promptManagerAction() {
     });
 }
 
-
 //VIEW PRODUCTS FOR SALE (working)
 function displayItemInventory() {
-  console.log('___ENTER displayItemInventory___');
-
     var queryProductList = connection.query("SELECT * FROM products",
-  
       function (err, res) {
+        console.log(chalk.green('\n'+'\n'+ 'COMPLETE INVENTORY LIST'));
         console.log(chalk.green('\n' + "ID | PRODUCT NAME | DEPARTMENT | PRICE | STOCK ON HAND"));
-  
-        if (err) throw err;
-
-        for (var i = 0; i < res.length; i++) {
+         if (err) throw err;
+       for (var i = 0; i < res.length; i++) {
           console.log(chalk.green(
             res[i].item_id + " | "
             + res[i].product_name + " | "
@@ -102,17 +96,13 @@ function displayItemInventory() {
     promptManagerAction(); 
 }
 
-//VIEW LOW INVENTORY LIST
+//VIEW LOW INVENTORY LIST (working)
 function displayLowInventory() {
-  console.log('___ENTER displayLowInventory___');
-
-    var queryLowInventoryList = connection.query("SELECT * FROM products WHERE stock_quantity < 5",
-  
+    var queryLowInventoryList = connection.query("SELECT * FROM products WHERE stock_quantity < 100",  
       function (err, res) {
+        console.log(chalk.green('\n'+'\n'+'INVENTORY ITEMS BELOW SOH = 100'));
         console.log(chalk.green('\n' + "ID | PRODUCT NAME | DEPARTMENT | PRICE | STOCK ON HAND"));
-  
-        if (err) throw err;
-
+          if (err) throw err;
         for (var i = 0; i < res.length; i++) {
           console.log(chalk.green(
             res[i].item_id + " | "
@@ -124,7 +114,8 @@ function displayLowInventory() {
       });
     //logs the actual query being run
     console.log("Low Inventory List Query: " + queryLowInventoryList.sql + '\n');
-  }
+    promptManagerAction(); 
+}
 
 //ADD STOCK QUANTITY TO INVENTORY ITEM
 function addItemSOH() {
