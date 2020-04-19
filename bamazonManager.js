@@ -4,13 +4,12 @@ require("dotenv").config();
 var mysql = require("mysql");
 var chalk = require("chalk");
 //var table = require("text-table");
-
 var formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: "USD",
   minimumFractionDigits: 2
-})
-
+});
+//CONNECTION (working)
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -18,17 +17,13 @@ var connection = mysql.createConnection({
   password: process.env.secret,
   database: "bamazon",
 });
-
-connection.connect(function (err) {
-  if (err) {
+connection.connect(function (err) { if (err) {
     console.error(chalk.magenta('ERROR CONNECTING: ' + err.stack));
     return;
   }
-  
   console.log(chalk.yellow('YOU ARE CONNECTED: ' + connection.threadId +'\n'));
   promptManagerAction()
 });
-
 //SWITCH PROMPTS (working)
 function promptManagerAction() {
     console.log(chalk.yellow('USE ARROWS TO SELECT A MANAGER ACTION'+'\n'));
@@ -74,8 +69,7 @@ function promptManagerAction() {
                 exit(1);
             }
     });
-}
-
+};
 //VIEW PRODUCTS FOR SALE (working)
 function displayItemInventory() {
     var queryProductList = connection.query("SELECT * FROM products",
@@ -94,8 +88,7 @@ function displayItemInventory() {
     });
     console.log("product list query: " + queryProductList.sql + '\n');
     promptManagerAction(); 
-}
-
+};
 //VIEW LOW INVENTORY LIST (working)
 function displayLowInventory() {
     var queryLowInventoryList = connection.query("SELECT * FROM products WHERE stock_quantity < 100",  
@@ -115,29 +108,86 @@ function displayLowInventory() {
     //logs the actual query being run
     console.log("Low Inventory List Query: " + queryLowInventoryList.sql + '\n');
     promptManagerAction(); 
-}
-
+};
+//VALIDATE INPUT IS NOT NEGATIVE (working)
+function validateInput(value) {
+    var integer = Number.isInteger(parseFloat(value));
+    var sign = Math.sign(value);
+  
+    if (integer && (sign === 1)) {
+      return true;
+    } else {
+      return 'Must enter a non-negative number. Please try again.';
+    }
+};
+ 
 //ADD STOCK QUANTITY TO INVENTORY ITEM
 function addItemSOH() {
-    if (qryParameter === "") {
-        // qryParameter = enter default value here//
-    }
-    //CONSTRUCT THE QUERY TO UPDATE THE INVENTORY 
-    var addItemStockonHand = connection.query(
-        'UPDATE products SET stock_quantity=' 
-        + (stock_quantity + input.quantity) 
-        + ' WHERE item_id = ' + item);
+    inquirer.prompt([
+            {
+                type: 'input',
+                name: 'item_id',
+                message: 'Select item_id to add Quanity to Stock-on-Hand?',
+                validate: validateInput,  //make sure item is not negative.
+                filter: Number
+            },
+            {
+                type: 'input',
+                name: 'quantity',
+                message: 'How many units would you like to add to inventory?',
+                validate: validateInput, //make sure item is not negative.
+                filter: Number
+            }
+     
+    ])
+    .then(function (input) {
+        
+        var item = input.item_id;
+        var inputQuantity = input.quantity;
+        
+        var queryData = 'SELECT * FROM products WHERE ?';
 
-     //logs the actual query being run
-     console.log(chalk.blue('\n' + 'NEW STOCK ON HAND QTY:  ' + (stock_quantity + input.quantity)));
-    console.log("product list query: " + addItemStockonHand.sql + '\n');
-}
+        connection.query(queryData, { item_id: item }, function (err, data) 
+            {
+                if (err) throw err;
+                //console.log('data = ' + JSON.stringify(data));
+
+                if (data.length === 0) {
+
+                    console.log(chalk.bgMagenta('ERROR: Invalid Item ID. Please select another Item.'));
+                    displayItemInventory();
+                } else 
+                    {
+                        var quantityData = data[0];
+
+                        console.log('\n' + 'updating stock quantity...' + JSON.stringify(quantityData));
+
+                        //CONSTRUCT THE QUERY TO UPDATE THE INVENTORY 
+
+                        var addItemStock = connection.query(
+                            'UPDATE products SET stock_quantity='
+                            + (quantityData.stock_quantity + inputQuantity)
+                            + ' WHERE item_id = ' + item);
+
+                        //logs the actual query being run
+                        console.log(chalk.blue(
+                            '\n' 
+                            + 'PREVIOUS STOCK ON HAND QTY:  ' + quantityData.stock_quantity  + '\n'
+                            + 'ADDED STOCK ON HAND QTY:  ' + inputQuantity + '\n'
+                            + '_______________________________' + '\n'
+                            + 'NEW STOCK ON HAND QTY:  ' + (quantityData.stock_quantity + inputQuantity) + '\n'
+                            ));
+                        console.log("product list query: " + addItemStock.sql + '\n');
+                    }
+                    promptManagerAction(); 
+            });
+        });
+};
+    
+
 
 //ADD NEW ITEM TO PRODUCT LIST
 function addNewItem() {
-    if (qryParameter === "") {
-        // qryParameter = enter default value here//
-    }
     var addNewInventoryItem = connection.query(
         'INSERT INTO products (product_name,department_name,price,stock_quantity) VALUES (input.product_name, input.department_name, input.price, input.stock_quantity)'); 
 
@@ -145,6 +195,6 @@ function addNewItem() {
     console.log(itemID)
     //logs the actual query being run
     console.log("product list query: " + addNewInventoryItem.sql + '\n');
-    connection.end()
-  }
+    connection.end();
+};
 
