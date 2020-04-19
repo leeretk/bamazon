@@ -70,7 +70,15 @@ function promptOrderItem() {
       message: 'How many units would you like to buy?',
       validate: validateInput, //make sure item is not negative.
       filter: Number
-    }]).then(function (input) {
+    }
+  
+  
+
+
+
+    
+  
+  ]).then(function (input) {
 
       var item = input.item_id;
       var quantity = input.quantity;
@@ -116,8 +124,26 @@ function promptOrderItem() {
               console.log(chalk.yellow("\n----------------------------ORDER COMPLETE------------------------------------\n"));
               console.log(chalk.blue('\n' + 'NEW STOCK ON HAND QTY:  ' + (orderData.stock_quantity - quantity)));
 
-              // End the database connection
-              connection.end();
+            //CONSTRUCT THE QUERY TO UPDATE THE SALES TOTAL
+            var updateSalesData = 'UPDATE products SET product_sales = ' + (orderData.price * quantity) + ' WHERE item_id = ' + item;
+
+                //PROCESS ORDER AND UPDATE PRODUCTS SALES 
+                connection.query(updateSalesData, function (err, data) {
+                  if (err) throw err;
+
+                  console.log(chalk.yellow("\n---------------------------ORDER DATA------------------------------------------\n"));
+
+                  console.log(chalk.green(
+                    '\n' + 'Item Id: ' + updateSalesData.item_id + '  Product Name: ' + orderData.product_name + '  Stock on Hand: ' + orderData.stock_quantity
+                    + '\n' + 'Item Price: ' + formatter.format(orderData.price)
+                    + '\n' + 'Order Quantity: ' + input.quantity
+                    + '\n' + '******************************'
+                    + '\n' + 'PRODUCT SALES TOTAL: ' + formatter.format(orderData.price * quantity)
+                    + '\n' + '******************************'
+                  ));
+                  console.log(chalk.yellow('\n' + 'Your order has been placed! Thank you for shopping with bamazon!'));
+                  console.log(chalk.yellow("\n----------------------------ORDER COMPLETE------------------------------------\n"));
+                  console.log(chalk.blue('\n' + 'NEW STOCK ON HAND QTY:  ' + (orderData.stock_quantity - quantity)));
             })
           } else {
             console.log(chalk.bgMagenta('Sorry, there is not enough product in stock, would you like to purchase something else?'));
