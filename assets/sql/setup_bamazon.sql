@@ -29,9 +29,7 @@ INSERT INTO products (product_name,department_name,price,stock_quantity)
 
 Select * from products;
 
--- UPDATE ice_rinks set iceName='Foothills' where id = '2';
-
-
+-- UPDATE products SET stock_quantity='500' where item_id = '2';
 
 
 

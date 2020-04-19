@@ -144,3 +144,4 @@ function validateInput(value) {
 
 // console.log(chalk.yellow("Would you like to place another order?"));
 // displayItemInventory();
+
