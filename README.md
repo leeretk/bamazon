@@ -1,4 +1,4 @@
-# bamazon
+# BAMAZON CUSTOMER ORDER CENTER
 
 BAMAZON is an online ordering center.  
 
@@ -29,3 +29,26 @@ Invalid Quantity:
 
 Unavailable Stock Qty:
 {insert picture from Node}
+
+## Decrement Inventory
+
+Here the program will deduct the order quantity from the stock on hand quantity and show the new quantity on hand. 
+
+
+
+
+
+## Would you like to place another order
+
+
+
+
+# BAMAZON INVENTORY MANAGER
+
+
+
+
+
+
+# BAMAZON SUPERVISOR
+
