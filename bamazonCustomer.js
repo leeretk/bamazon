@@ -16,6 +16,7 @@ var connection = mysql.createConnection({
   user: "root",
   password: process.env.secret,
   database: "bamazon",
+  multipleStatements: true,
 });
 connection.connect(function (err) {
   if (err) {
@@ -30,7 +31,7 @@ function displayItemInventory() {
   var queryProductList = connection.query("SELECT * FROM products",
 
     function (err, res) {
-      console.log(chalk.green('\n' + "ID | PRODUCT NAME | DEPARTMENT | PRICE | STOCK ON HAND"));
+      console.log(chalk.green('\n' + "ID | PRODUCT NAME | DEPARTMENT | PRICE | STOCK ON HAND | PRODUCT SALES"));
 
       if (err) throw err;
       for (var i = 0; i < res.length; i++) {
@@ -95,8 +96,7 @@ function placeOrder() {
       filter: Number
     }
   ]).then(function(input) {
-        console.log('user selected: ' + JSON.stringify(input));
-
+        // console.log('user selected: ' + JSON.stringify(input));
         //create variables for item input
         var item = input.item_id;
         var quantity = input.quantity;
@@ -105,21 +105,30 @@ function placeOrder() {
 
         connection.query(queryData, { item_id: item }, function (err, data) {
           if (err) throw err;
-          //console.log('data = ' + JSON.stringify(data));
+          // console.log('data = ' + JSON.stringify(data));
           if (data.length === 0) {
             console.log(chalk.bgMagenta('ERROR: Invalid Item ID. Please select another Item.'));
             displayItemInventory();
           } else {
             var orderData = data[0];
-            //console.log('\n' + 'orderData = ' + JSON.stringify(orderData));
+            console.log('\n' + 'orderData = ' + JSON.stringify(orderData));
             //VALIDATE THERE IS QUANTITY IN STOCK TO FILL ORDER?
             if (quantity <= orderData.stock_quantity) {
               console.log(chalk.yellow('\n' + '****Item is available, your order is being processed!****' + '\n'));
+
+//******************************************THIS IS WHERE YOU ARE STUCK *****************************************///
+
               //CONSTRUCT THE QUERY TO UPDATE THE INVENTORY QUANTITY AFTER AN ORDER HAS BEEN FILLED.
-              var updateInventoryQueryData = 'UPDATE products SET stock_quantity = ' + (orderData.stock_quantity - quantity) + ' WHERE item_id = ' + item;
+              var stockQuantity = (orderData.stock_quantity - quantity)
+              var productSales = (orderData.price * quantity)
+
+              var updateOrderData = 'UPDATE products SET stock_quantity =?' + stockQuantity + ',product_sales=?'+ productSales + ', WHERE item_id =?' + item ;  
+    
               //PROCESS ORDER AND UPDATE INVENTORY STOCK ON HAND QUANTITY
-              connection.query(updateInventoryQueryData, function (err, data) {
+              connection.query(updateOrderData, [stock_quantity, products_sales], function (err, res, field) {
                 if (err) throw err;
+                console.log("QUERY WORKED**************************************************")
+
                 console.log(chalk.yellow("\n---------------------------ORDER DATA------------------------------------------\n"));
                 console.log(chalk.green(
                   '\n' + 'Item Id: ' + orderData.item_id + '  Product Name: ' + orderData.product_name + '  Stock on Hand: ' + orderData.stock_quantity
@@ -132,28 +141,14 @@ function placeOrder() {
                 console.log(chalk.yellow('\n' + 'Your order has been placed! Thank you for shopping with bamazon!'));
                 console.log(chalk.yellow("\n----------------------------ORDER COMPLETE------------------------------------\n"));
                 console.log(chalk.blue('\n' + 'NEW STOCK ON HAND QTY:  ' + (orderData.stock_quantity - quantity)));
-                displayProductSales();
-        });
+                console.log(chalk.blue('\n' + 'PRODUCT SALES TOTAL: ' + formatter.format(orderData.price * quantity)));
+                promptOrderItem();
+              });
       };
     };
   })
 });
-
-//DISPLAY UPDATE TO PRODUCT SALES FIELD//
-    function displayProductSales() {
-      var productSales = input.product_sales;
-      //CONSTRUCT THE QUERY TO UPDATE THE SALES TOTAL
-      var updateProductSales = 'UPDATE products SET product_sales = ' + (orderData.price * quantity) + ' WHERE item_id = ' + item;
-      //PROCESS ORDER AND UPDATE PRODUCTS SALES 
-      connection.query(updateProductSales, function (err, data) {
-        if (err) throw err;
-        console.log(chalk.yellow("\n---------------------------SALES ORDER TOTAL------------------------------------------\n"));
-        console.log(chalk.green('\n' + '\n' + 'PRODUCT SALES TOTAL: ' + formatter.format(orderData.price * quantity)));
-        console.log(chalk.green('\n' + '\n' + 'PRODUCT SALES: ' + formatter.format(productSales)));
-        promptOrderItem();
-      });
-    };
-    //VALIDATE INPUT IS NOT NEGATIVE
+//VALIDATE INPUT IS NOT NEGATIVE
 function validateInput(value) {
       var integer = Number.isInteger(parseFloat(value));
       var sign = Math.sign(value);
@@ -163,7 +158,8 @@ function validateInput(value) {
         return 'Must enter a non-negative number. Please try again.';
       }
 };
-}      
+}
+//END PROGRAM
 function endProgram() {
   console.log('*******SESSION ENDED******')
   connection.end();
