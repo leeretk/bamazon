@@ -9,6 +9,8 @@ CREATE TABLE departments (
     ,primary key(department_id)
 );
 
+ALTER TABLE departments ADD total_profit decimal(5,2);
+
 INSERT INTO departments (department_name, over_head_costs)
 	VALUES 
      ('boys',0)
