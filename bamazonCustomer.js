@@ -100,7 +100,6 @@ function placeOrder() {
     //create variables for item input
     var item = input.item_id;
     var quantity = input.quantity;
-    var productSales = input.productSales;
 
     var queryData = 'SELECT * FROM products WHERE ?';
 
@@ -113,16 +112,21 @@ function placeOrder() {
       } else {
         var orderData = data[0];
         console.log('\n' + 'orderData = ' + JSON.stringify(orderData));
-
+        
         //VALIDATE THERE IS QUANTITY IN STOCK TO FILL ORDER?
         if (quantity <= orderData.stock_quantity) {
           console.log(chalk.yellow('\n' + '****Item is available, your order is being processed!****' + '\n'));
+          updateProducts();
+        }
+      };
 
+function updateProducts() {
+        console.log("Updating SOH quantity and product sales")
           //CONSTRUCT THE QUERY TO UPDATE THE INVENTORY QUANTITY AFTER AN ORDER HAS BEEN FILLED.
           var stockQuantity = (orderData.stock_quantity - quantity)
           var productSales = (orderData.price * quantity)
 
-          connection.query("UPDATE auctions SET ? WHERE ?",
+          connection.query("UPDATE proucts SET ? WHERE ?="+item,
             [
               {
                 stock_quantity: stockQuantity
@@ -136,24 +140,19 @@ function placeOrder() {
               console.log("Data updated successfully!");
             }
           );
-        }
-          //PROCESS ORDER AND UPDATE INVENTORY STOCK ON HAND QUANTITY
-
+        //PROCESS ORDER AND UPDATE INVENTORY STOCK ON HAND QUANTITY
           console.log(chalk.yellow("\n---------------------------ORDER DATA------------------------------------------\n"));
           console.log(chalk.green(
-            '\n' + 'Item Id: ' + orderData.item_id + '  Product Name: ' + orderData.product_name + '  Stock on Hand: ' + orderData.stock_quantity
-            + '\n' + 'Item Price: ' + formatter.format(orderData.price)
-            + '\n' + 'Order Quantity: ' + input.quantity
-            + '\n' + '******************************'
-            + '\n' + 'ORDER TOTAL: ' + formatter.format(orderData.price * quantity)
+            '\n' + 'ORDER TOTAL: ' + formatter.format(orderData.price * quantity)
+            + '\n' + 'ORDER TOTAL: ' + formatter.format(productSales)
             + '\n' + '******************************'
           ));
           console.log(chalk.yellow('\n' + 'Your order has been placed! Thank you for shopping with bamazon!'));
           console.log(chalk.yellow("\n----------------------------ORDER COMPLETE------------------------------------\n"));
-          console.log(chalk.blue('\n' + 'NEW STOCK ON HAND QTY:  ' + (orderData.stock_quantity - quantity)));
+          console.log(chalk.blue('NEW STOCK ON HAND QTY:  ' + (orderData.stock_quantity - quantity)));
           console.log(chalk.blue('\n' + 'PRODUCT SALES TOTAL: ' + formatter.format(orderData.price * quantity)));
           promptOrderItem();
-      };
+      }
     });
   });
 };
