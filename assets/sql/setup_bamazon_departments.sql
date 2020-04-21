@@ -8,17 +8,14 @@ CREATE TABLE departments (
     ,over_head_costs decimal(5,2)
     ,primary key(department_id)
 );
-
-ALTER TABLE departments ADD total_profit decimal(5,2);
-
 INSERT INTO departments (department_name, over_head_costs)
 	VALUES 
-     ('boys',0)
-    ,('girls',0)
-    ,('entertainment',0)
-    ,('kitchen',0)
-    ,('toys',0)
-    ,('health',0);
+     ('boys',450)
+    ,('girls',600)
+    ,('entertainment',140)
+    ,('kitchen',421)
+    ,('toys',669)
+    ,('health',345);
 
 Select * from departments;
 
