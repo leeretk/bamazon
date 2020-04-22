@@ -3,7 +3,7 @@ var inquirer = require("inquirer");
 require("dotenv").config();
 var mysql = require("mysql");
 var chalk = require("chalk");
-var table = require("console.table")
+// var table = require("console.table")
 var formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: "USD",
@@ -35,15 +35,7 @@ function displayItemInventory() {
 
       if (err) throw err;
       for (var i = 0; i < res.length; i++) {
-         
-        const table = new table({ 
-          head: ["ID" , "PRODUCT NAME", "DEPARTMENT", " PRICE", "STOCK ON HAND"], colWidths: [10,15,15,10,10] 
-        }
-
-        table.push(res[i].item_id, res[i].product_name, res[i].department_name,formatter.format(res[i].price),res[i].stock_quantity)
-
-        console.log(table.toString());
-
+       
           console.log(chalk.green(
             res[i].item_id + " | "
             + res[i].product_name + " | "
