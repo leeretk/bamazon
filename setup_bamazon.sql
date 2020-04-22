@@ -13,8 +13,10 @@ CREATE TABLE products (
     ,stock_quantity integer
     ,primary key(item_id)
 );
+USE bamazon;
+ALTER TABLE products ADD product_sales decimal(10,2);
 
-ALTER TABLE products ADD product_sales decimal(5,2);
+
 
 INSERT INTO products (product_name,department_name,price,stock_quantity)
 	VALUES 
@@ -33,7 +35,26 @@ Select * from products;
 
 -- UPDATE products SET stock_quantity='500' where item_id = '2';
 
+DROP table IF EXISTS departments;
 
+CREATE TABLE departments (
+	department_id integer auto_increment
+    ,department_name varchar(150)
+    ,over_head_costs decimal(5,2)
+    ,primary key(department_id)
+);
+INSERT INTO departments (department_name, over_head_costs)
+	VALUES 
+     ('boys',450)
+    ,('girls',600)
+    ,('entertainment',140)
+    ,('kitchen',421)
+    ,('toys',669)
+    ,('health',345);
+
+Select * from departments;
+
+-- UPDATE departments SET over_head_costs='***' where department = '**';
 
 
 

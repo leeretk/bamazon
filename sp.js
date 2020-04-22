@@ -32,10 +32,13 @@ function promptSupervisorAction() {
         {
             type: 'list',
             name: 'option',
-            choices: ['view-products-sales-by-dept', 'create-new-department', 'exit'],
+            choices: ['view-products-sales-by-dept', 'view-department-profit-loss', 'create-new-department', 'exit'],
             filter: function (selection) {
                 if (selection === 'view-products-sales-by-dept') {
                     return 'productSalesDept';
+                  } else if (selection === 'view-department-profit-loss') {
+                    return 'deptProfitLoss';
+
                 } else if (selection === 'create-new-department') {
                     return 'newDepartment';
                 } else if (selection === 'exit') {
@@ -51,9 +54,12 @@ function promptSupervisorAction() {
         // console.log('user selected: ' + JSON.stringify(input));
         if (input.option === 'productSalesDept') {
                 displayDeptSales();
-            } else if (input.option === 'newDepartment') {
-                addNewDept();
+            } else if (input.option === 'deptProfitLoss') {
+              displayDeptProfitLoss();
             } 
+           else if (input.option === 'newDepartment') {
+            addNewDept();
+          } 
             else if (input.option === 'exitProgram') {
                 endProgram();
            }           
@@ -65,8 +71,7 @@ function promptSupervisorAction() {
 };
 //VIEW SALES SALE (working)
 function displayDeptSales() {
-    var queryDeptSalesList = connection.query("SELECT dep.department_id,dep.department_name,sum(pr.product_sales) as over_head_costs FROM departments dep LEFT JOIN bamazon.products pr ON dep.department_name = pr.department_name GROUP BY dep.department_id,dep.department_name",
-
+    var queryDeptSalesList = connection.query("SELECT dep.department_id,dep.department_name,sum(pr.product_sales) as sum_product_sales FROM departments dep LEFT JOIN bamazon.products pr ON dep.department_name = pr.department_name GROUP BY dep.department_id,dep.department_name",
       function (err, res) {
         console.log(chalk.green('\n'+'\n'+ 'DEPARTMENT SALES'));
         console.log(chalk.green('\n' + "DEPT ID | DEPARTMENT NAME | PRODUCT SALES"));
@@ -78,8 +83,26 @@ function displayDeptSales() {
             + formatter.format(res[i].over_head_costs)));
         };
     });
-    console.log("product list query: " + queryDeptSalesList.sql + '\n');
+    // console.log("product list query: " + queryDeptSalesList.sql + '\n');
     promptSupervisorAction(); 
+};
+//VIEW SALES SALE (working)
+function displayDeptProfitLoss() {
+  var queryDeptProfitLoss = connection.query("SELECT dep.department_id,dep.department_name ,sum(pr.product_sales) as sum_product_sales ,sum(dep.over_head_costs) as sum_over_head_costs,sum(pr.product_sales) - sum(dep.over_head_costs) as Sum_Profit_Loss FROM departments dep LEFT JOIN bamazon.products pr ON dep.department_name = pr.department_name GROUP BY dep.department_id,dep.department_name",
+
+    function (err, res) {
+      console.log(chalk.green('\n'+'\n'+ 'DEPARTMENT SALES & PROFIT lOSS'));
+      console.log(chalk.green('\n' + "DEPT ID | DEPARTMENT NAME | SUM PRODUCT SALES | SUM OVERHEAD COST | PROFIT/LOSS"));
+       if (err) throw err;
+     for (var i = 0; i < res.length; i++) {
+        console.log(chalk.green(
+          res[i].department_id + " | "
+          + res[i].department_name + " | "
+          + formatter.format(res[i].over_head_costs)));
+      };
+  });
+  // console.log("product list query: " + queryDeptSalesList.sql + '\n');
+  promptSupervisorAction(); 
 };
 //ADD NEW DEPARTMENT TO PRODUCT LIST (working)
 function addNewDept() {
@@ -103,7 +126,6 @@ function addNewDept() {
         connection.query(addNewDepartment, [input.department_id, input.department_name, input.over_head_costs], 
              function(err, res) {
                     if (err) throw err;    
-
                         console.log('New product ID: ' + res.insertId + '.');
                         //SHOW INPUT FROM PROMPT
                         console.log(chalk.red(

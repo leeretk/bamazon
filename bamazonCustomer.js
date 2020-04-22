@@ -31,7 +31,7 @@ function displayItemInventory() {
   var queryProductList = connection.query("SELECT * FROM products",
 
     function (err, res) {
-      console.log(chalk.green('\n' + "ID | PRODUCT NAME | DEPARTMENT | PRICE | STOCK ON HAND | PRODUCT SALES"));
+      console.log(chalk.green('\n' + "ID | PRODUCT NAME | DEPARTMENT | PRICE | STOCK ON HAND"));
 
       if (err) throw err;
       for (var i = 0; i < res.length; i++) {
@@ -45,7 +45,7 @@ function displayItemInventory() {
       promptOrderItem();
     });
   //logs the actual query being run
-  console.log("product list query: " + queryProductList.sql + '\n');
+  // console.log("product list query: " + queryProductList.sql + '\n');
 }
 //FUNCTION TO PROMPT SWITCH (working)
 function promptOrderItem() {
@@ -111,52 +111,42 @@ function placeOrder() {
         displayItemInventory();
       } else {
 
-            var orderData = data[0];
-            console.log('\n' + 'orderDataforqueryvalidation = ' + JSON.stringify(orderData));
-                                         
-              //VALIDATE THERE IS QUANTITY IN STOCK TO FILL ORDER?
-              if (quantity <= orderData.stock_quantity) {
-                console.log(chalk.yellow('\n' + '****Item is available, your order is being processed!****' + '\n'));
+        var orderData = data[0];
+        // console.log('\n' + 'orderDataforqueryvalidation = ' + JSON.stringify(orderData));
+        //VALIDATE THERE IS QUANTITY IN STOCK TO FILL ORDER?
+        if (quantity <= orderData.stock_quantity) {
+          console.log(chalk.yellow('\n' + '****Item is available, your order is being processed!****' + '\n'));
 
-                  var updateInventoryQueryData = 'UPDATE products SET stock_quantity = ' + (orderData.stock_quantity - quantity) + ' WHERE item_id = ?';
-                  
-                
-                    connection.query(updateInventoryQueryData, item, function(err) {
-                                if (err) throw err;
-                                console.log('\n' + 'orderData loaded = ' + JSON.stringify(orderData));    
-                                console.log(chalk.red("Quantity updated successfully!"));
+          var updateInventoryQueryData = 'UPDATE products SET stock_quantity = ' + (orderData.stock_quantity - quantity) + ' WHERE item_id = ?';
 
-                    });
+          connection.query(updateInventoryQueryData, item, function (err) {
+            if (err) throw err;
+            // console.log('\n' + 'orderData loaded = ' + JSON.stringify(orderData));
+            // console.log(chalk.red("Quantity updated successfully!"));
+         });
+          var updateInventorySales = 'UPDATE products SET product_sales = ' + (orderData.price * quantity) + ' WHERE item_id = ?';
+          connection.query(updateInventorySales, item, function (err) {
+            if (err) throw err;
+            // console.log('\n' + 'orderData loaded = ' + JSON.stringify(orderData));
+            // console.log(chalk.red("sales updated successfully!"));
+          });
+        };
+        //PROCESS ORDER AND UPDATE INVENTORY STOCK ON HAND QUANTITY
+        console.log(chalk.yellow("\n---------------------------ORDER DATA------------------------------------------\n"));
+        console.log(chalk.green(
+            '\n' + 'ORDER TOTAL: ' + formatter.format(orderData.price * quantity)
+          + '\n' + '******************************'
+          +'\n' + 'Your order has been placed! Thank you for shopping with bamazon!'
+          + "\n----------------------------ORDER COMPLETE------------------------------------"
+        ));
+        console.log(chalk.red('NEW STOCK ON HAND QTY:  ' + (orderData.stock_quantity - quantity)+'\n'));
+        console.log(chalk.red('PRODUCT SALES TOTAL: ' + formatter.format(orderData.price * quantity)));
 
-                  var updateInventorySales = 'UPDATE products SET product_sales = ' + (orderData.price * quantity) + ' WHERE item_id = ?';
-
-                    connection.query(updateInventorySales, item, function(err) {
-                      if (err) throw err;
-                      console.log('\n' + 'orderData loaded = ' + JSON.stringify(orderData));    
-                      console.log(chalk.red("sales updated successfully!"));
-
-                    });
-    };
-
-            
-                //PROCESS ORDER AND UPDATE INVENTORY STOCK ON HAND QUANTITY
-              console.log(chalk.yellow("\n---------------------------ORDER DATA------------------------------------------\n"));
-              console.log(chalk.green(
-                '\n' + 'ORDER TOTAL: ' + formatter.format(orderData.price * quantity)
-                // + '\n' + 'ORDER TOTAL: ' + formatter.format(productSales)
-                + '\n' + '******************************'
-              ));
-              console.log(chalk.yellow('\n' + 'Your order has been placed! Thank you for shopping with bamazon!'));
-              console.log(chalk.yellow("\n----------------------------ORDER COMPLETE------------------------------------\n"));
-              console.log(chalk.blue('NEW STOCK ON HAND QTY:  ' + (orderData.stock_quantity - quantity)));
-              console.log(chalk.blue('\n' + 'PRODUCT SALES TOTAL: ' + formatter.format(orderData.price * quantity)+'\n'));
-              promptOrderItem();
-
-        }
-      });
+        promptOrderItem();
+      }
+    });
   });
 };
-
 
 //VALIDATE INPUT IS NOT NEGATIVE
 function validateInput(value) {
@@ -173,3 +163,4 @@ function endProgram() {
   console.log('*******SESSION ENDED******')
   connection.end();
 };
+
