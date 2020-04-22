@@ -38,7 +38,6 @@ function promptSupervisorAction() {
                     return 'productSalesDept';
                   } else if (selection === 'view-department-profit-loss') {
                     return 'deptProfitLoss';
-
                 } else if (selection === 'create-new-department') {
                     return 'newDepartment';
                 } else if (selection === 'exit') {
@@ -55,10 +54,10 @@ function promptSupervisorAction() {
         if (input.option === 'productSalesDept') {
                 displayDeptSales();
             } else if (input.option === 'deptProfitLoss') {
-              displayDeptProfitLoss();
+                displayDeptProfitLoss();
             } 
            else if (input.option === 'newDepartment') {
-            addNewDept();
+              addNewDept();
           } 
             else if (input.option === 'exitProgram') {
                 endProgram();
@@ -78,9 +77,7 @@ function displayDeptSales() {
          if (err) throw err;
        for (var i = 0; i < res.length; i++) {
           console.log(chalk.green(
-            res[i].department_id + " | "
-            + res[i].department_name + " | "
-            + formatter.format(res[i].over_head_costs)));
+            res[i].department_id + " | " + res[i].department_name + " | " + formatter.format(res[i].sum_product_sales)));
         };
     });
     // console.log("product list query: " + queryDeptSalesList.sql + '\n');
@@ -88,17 +85,15 @@ function displayDeptSales() {
 };
 //VIEW SALES SALE (working)
 function displayDeptProfitLoss() {
-  var queryDeptProfitLoss = connection.query("SELECT dep.department_id,dep.department_name ,sum(pr.product_sales) as sum_product_sales ,sum(dep.over_head_costs) as sum_over_head_costs,sum(pr.product_sales) - sum(dep.over_head_costs) as Sum_Profit_Loss FROM departments dep LEFT JOIN bamazon.products pr ON dep.department_name = pr.department_name GROUP BY dep.department_id,dep.department_name",
+  var queryDeptProfitLoss = connection.query("SELECT dep.department_id,dep.department_name ,sum(pr.product_sales) as sum_product_sales ,sum(dep.over_head_costs) as sum_over_head_costs,sum(pr.product_sales) - sum(dep.over_head_costs) as sum_profit_loss FROM departments dep LEFT JOIN bamazon.products pr ON dep.department_name = pr.department_name GROUP BY dep.department_id,dep.department_name",
 
     function (err, res) {
-      console.log(chalk.green('\n'+'\n'+ 'DEPARTMENT SALES & PROFIT lOSS'));
+      console.log(chalk.green('\n'+'\n'+ 'DEPARTMENT PROFIT lOSS'));
       console.log(chalk.green('\n' + "DEPT ID | DEPARTMENT NAME | SUM PRODUCT SALES | SUM OVERHEAD COST | PROFIT/LOSS"));
        if (err) throw err;
      for (var i = 0; i < res.length; i++) {
         console.log(chalk.green(
-          res[i].department_id + " | "
-          + res[i].department_name + " | "
-          + formatter.format(res[i].over_head_costs)));
+          res[i].department_id + " | " + res[i].department_name + " | " + formatter.format(res[i].sum_product_sales + " | "  + formatter.format(res[i].sum_over_head_costs + " | " + formatter.format(res[i].sum_profit_loss)))));
       };
   });
   // console.log("product list query: " + queryDeptSalesList.sql + '\n');
