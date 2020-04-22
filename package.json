@@ -21,6 +21,7 @@
     "dotenv": "^8.2.0",
     "formatter": "^0.4.1",
     "inquirer": "^7.1.0",
+    "markdown-table": "^2.0.0",
     "mysql": "^2.18.1",
     "table": "^5.4.6",
     "text-table": "^0.2.0"

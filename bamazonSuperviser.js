@@ -3,6 +3,7 @@ var inquirer = require("inquirer");
 require("dotenv").config();
 var mysql = require("mysql");
 var chalk = require("chalk");
+var table = require("markdown-table");
 //var table = require("text-table");
 var formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -76,8 +77,17 @@ function displayDeptSales() {
             res[i].department_id + " | "
             + res[i].department_name + " | "
             + formatter.format(res[i].over_head_costs)));
-        };
+
+            table = ([
+                ["DEPT ID","DEPARTMENT NAME","PRODUCT SALES"],
+                [res[i].department_id, res[i].department_name, formatter.format(res[i].over_head_costs)]
+                ],{align: ['l', 'c', 'r']})
+
+            };
     });
+
+
+
     console.log("product list query: " + queryDeptSalesList.sql + '\n');
     promptSupervisorAction(); 
 };
