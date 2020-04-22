@@ -98,25 +98,26 @@ function addNewDept() {
             validate: validateInput,
         },   
     ]).then(function(input) {
-        //SHOW INPUT FROM PROMPT
-        console.log(chalk.blue(
-                '\n' 
-                + 'DEPARTMENT INPUT:     '
-                + 'DEPARTMENT ID:        ' + input.deptID + '\n'
-                + 'DEPARTMENT NAME:   ' + input.department_name  + '\n'
-                + 'OVERHEAD COSTS:' + formatter.format(input.over_head_costs) + '\n'
-        ));
+       
         //INSERT INPUT INTO SQL DATABASE & THEN SHOW FULL LIST RESULTS
-        var addNewDepartment = 'INSERT INTO departments SET ?';
+        var addNewDepartment = 'INSERT INTO departments (department_id, department_name, over_head_costs) VALUES (?,?,?)';
     
-        connection.query(addNewDepartment, input, 
-             function(err, res, fields) {
+        connection.query(addNewDepartment, [input.department_id, input.department_name, input.over_head_costs], 
+             function(err, res) {
                     if (err) throw err;    
-    
+
         console.log('New product ID: ' + res.insertId + '.');
+                        //SHOW INPUT FROM PROMPT
+                        console.log(chalk.blue(
+                            '\n' 
+                            + 'DEPARTMENT INPUT:     '
+                            + 'DEPARTMENT ID:        ' +  res.insertId + '\n'
+                            + 'DEPARTMENT NAME:   ' + input.department_name  + '\n'
+                            + 'OVERHEAD COSTS:' + formatter.format(input.over_head_costs) + '\n'
+                        ));
                 console.log("\n---------------------------------------------------------------------\n");
-        promptManagerAction();
-    });
+                promptSupervisorAction();
+            });
 })};
 
 //VALIDATE INPUT IS NOT NEGATIVE (working)

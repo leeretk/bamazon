@@ -206,23 +206,24 @@ function addNewItem() {
             validate: validateInput,
         }   
     ]).then(function(input) {
-        //SHOW INPUT FROM PROMPT
-        console.log(chalk.blue(
-                '\n' 
-                + 'ITEM INPUT:     '
-                + 'ITEM ID:        ' + input.itemID + '\n'
-                + 'PRODUCT NAME:   ' + input.product_name  + '\n'
-                + 'DEPARTMENT NAME:' + input.department_name + '\n'
-                + 'PRICE:          ' + formatter.format(input.price) + '\n'
-                + 'STOCK QTY:      ' + input.stock_quantity +'\n'
-        ));
+     
         //INSERT INPUT INTO SQL DATABASE & THEN SHOW FULL LIST RESULTS
         var addNewInventoryItem = 'INSERT INTO products SET ?';
     
         connection.query(addNewInventoryItem, input, 
              function(err, res, fields) {
                     if (err) throw err;    
-    
+                    
+       //SHOW INPUT FROM PROMPT
+       console.log(chalk.blue(
+        '\n' 
+        + 'ITEM INPUT:     '
+        + 'ITEM ID:        ' + res.insertId + '\n'
+        + 'PRODUCT NAME:   ' + input.product_name  + '\n'
+        + 'DEPARTMENT NAME:' + input.department_name + '\n'
+        + 'PRICE:          ' + formatter.format(input.price) + '\n'
+        + 'STOCK QTY:      ' + input.stock_quantity +'\n'
+));
         console.log('New product ID: ' + res.insertId + '.');
                 console.log("\n---------------------------------------------------------------------\n");
         promptManagerAction();
