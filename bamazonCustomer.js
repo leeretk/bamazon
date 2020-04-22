@@ -3,8 +3,7 @@ var inquirer = require("inquirer");
 require("dotenv").config();
 var mysql = require("mysql");
 var chalk = require("chalk");
-var table = require("markdown-table")
-//var table = require("text-table");
+var table = require("console.table")
 var formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: "USD",
@@ -36,12 +35,21 @@ function displayItemInventory() {
 
       if (err) throw err;
       for (var i = 0; i < res.length; i++) {
-        console.log(chalk.green(
-          res[i].item_id + " | "
-          + res[i].product_name + " | "
-          + res[i].department_name + " | "
-          + formatter.format(res[i].price) + " | "
-          + res[i].stock_quantity));
+         
+        const table = new table({ 
+          head: ["ID" , "PRODUCT NAME", "DEPARTMENT", " PRICE", "STOCK ON HAND"], colWidths: [10,15,15,10,10] 
+        }
+
+        table.push(res[i].item_id, res[i].product_name, res[i].department_name,formatter.format(res[i].price),res[i].stock_quantity)
+
+        console.log(table.toString());
+
+          console.log(chalk.green(
+            res[i].item_id + " | "
+            + res[i].product_name + " | "
+            + res[i].department_name + " | "
+            + formatter.format(res[i].price) + " | "
+            + res[i].stock_quantity));
       }
       promptOrderItem();
     });
@@ -143,14 +151,8 @@ function placeOrder() {
           +'\n' + 'Your order has been placed! Thank you for shopping with bamazon!'
         );
         console.log(chalk.yellow("\n----------------------------ORDER COMPLETE------------------------------------\n"));
-
-        // table = ([
-        //   ["DEPT ID","DEPARTMENT NAME","PRODUCT SALES"],
-        //   [res[i].item_id, res[i].product_name, res[i].department_name, formatter.format(res[i].price), res[i].stock_quantity]
-        //   ],{align: ['c', 'c', 'c', 'r','c']});
-        // console.log(table)
-        console.log(chalk.red('NEW STOCK ON HAND QTY:  ' + (orderData.stock_quantity - quantity)));
-        console.log(chalk.red('PRODUCT SALES TOTAL: ' + formatter.format(orderData.price * quantity) +"\n"));
+        console.log(chalk.yellow('NEW STOCK ON HAND QTY:  ' + (orderData.stock_quantity - quantity)));
+        console.log(chalk.yellow('PRODUCT SALES TOTAL: ' + formatter.format(orderData.price * quantity) +"\n"));
 
         promptOrderItem();
       }

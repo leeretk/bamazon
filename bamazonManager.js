@@ -3,7 +3,7 @@ var inquirer = require("inquirer");
 require("dotenv").config();
 var mysql = require("mysql");
 var chalk = require("chalk");
-//var table = require("text-table");
+var table = require("cli-table2");
 var formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: "USD",

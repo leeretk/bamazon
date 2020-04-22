@@ -18,6 +18,8 @@
   "homepage": "https://github.com/leeretk/bamazon#readme",
   "dependencies": {
     "chalk": "^4.0.0",
+    "cli-table2": "^0.2.0",
+    "console.table": "^0.10.0",
     "dotenv": "^8.2.0",
     "formatter": "^0.4.1",
     "inquirer": "^7.1.0",
