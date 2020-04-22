@@ -10,11 +10,11 @@ BAMAZON is an online ordering center.
 2) Question appears asking customer to select an item_id
 3) Quesion appears asking the cusomter how many they would like to order.
 
-{insert picture from Node}
+-[](https://github.com/leeretk/bamazon/blob/master/assets/images/customer_1_initialize.JPG)
 
 ### Enter Order Information
 
-{insert picture from Node}
+-[](https://github.com/leeretk/bamazon/blob/master/assets/images/customer_2_enter_order.JPG)
 
 ### Validate Order Information
 
@@ -24,13 +24,15 @@ Validate also checks to make sure the item ID entered is availabe.
 When an item is entered incorrectly the following messages appear.
 
 Invalid Item ID:
-{insert picture from Node}
+-[](https://github.com/leeretk/bamazon/blob/master/assets/images/customer_3_itemid_validation.JPG)
 
 Invalid Quantity:
-{insert picture from Node}
+-[](https://github.com/leeretk/bamazon/blob/master/assets/images/customer_4_quantity_validation.JPG)
 
 Unavailable Stock Qty:
-{insert picture from Node}
+-[](https://github.com/leeretk/bamazon/blob/master/assets/images/customer_5_invalid_itemid_msg.JPG)
+-[](https://github.com/leeretk/bamazon/blob/master/assets/images/customer_6_stock_out_msg.JPG)
+-[](https://github.com/leeretk/bamazon/blob/master/assets/images/customer_7_new_soh_qty.JPG)
 
 ### Decrement Inventory
 
