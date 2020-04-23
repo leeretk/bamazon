@@ -4,14 +4,9 @@ BAMAZON is an online ordering center.
 
 ## BAMAZON CUSTOMER ORDER CENTER
 
-## GitHub Repository: https://github.com/leeretk/liri-node-app
+## GitHub Repository: https://github.com/leeretk/bamazon
 
-### What can Liri find for you?
-* Songs using Spotify
-* Upcoming Concerts with Bands in Town
-* Movie Information with OMDB
-
-### Technolgoy 
+## Technolgoy 
 * [Inquirer](https://www.npmjs.com/package/inquirer)
 * [mysql](https://www.npmjs.com/package/mysql)
 
