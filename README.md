@@ -32,11 +32,9 @@ BAMAZON is an online ordering center.
 ![](https://github.com/leeretk/bamazon/blob/master/assets/images/customer_1_initialize.JPG)
 
 ### Enter Order Information
-
 ![](https://github.com/leeretk/bamazon/blob/master/assets/images/customer_2_enter_order.JPG)
 
 ### Validate Order Information
-
 Validation occurs when the item ID and the order quantity are entered.  Validate ensures the number entered is a positive integeter.
 Validate also checks to make sure the item ID entered is availabe.
 
@@ -54,19 +52,33 @@ Unavailable Stock Qty:
 
 
 ### Decrement Inventory
-
 Here the program will deduct the order quantity from the stock on hand quantity and show the new quantity on hand.
 ![](https://github.com/leeretk/bamazon/blob/master/assets/images/customer_7_new_soh_qty.JPG)
 
 ### Would you like to place another order
 
 ## BAMAZON INVENTORY MANAGER
+Initialize Manager Portal:
+![](https://github.com/leeretk/bamazon/blob/master/assets/images/manager_initialize.JPG)
 
+Manager Item List:
+![](https://github.com/leeretk/bamazon/blob/master/assets/images/manager_itemlist.JPG)
 
+Manager Low Inventory:
+![](https://github.com/leeretk/bamazon/blob/master/assets/images/manager_lowInvetory.JPG)
+
+Manager Add Stock to an Inventory Item:
+![](https://github.com/leeretk/bamazon/blob/master/assets/images/manager_addstock.JPG)
+
+Manager Add new Item to Inventory: 
+![](https://github.com/leeretk/bamazon/blob/master/assets/images/manager_addproduct.JPG)
 
 ## BAMAZON SUPERVISOR
+Initialize Supervisor Portal:
+![](https://github.com/leeretk/bamazon/blob/master/assets/images/superviser_productsales.JPG)
 
+Supervisor Profit Loss:
+![](https://github.com/leeretk/bamazon/blob/master/assets/images/superviser_profitloss.JPG)
 
-
-
-
+Supervisor New Department:
+![](https://github.com/leeretk/bamazon/blob/master/assets/images/superviser_newdepartment.JPG)
