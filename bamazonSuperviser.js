@@ -3,7 +3,7 @@ var inquirer = require("inquirer");
 require("dotenv").config();
 var mysql = require("mysql");
 var chalk = require("chalk");
-var table = require("markdown-table");
+// var table = require("markdown-table");
 //var table = require("text-table");
 var formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -33,16 +33,17 @@ function promptSupervisorAction() {
         {
             type: 'list',
             name: 'option',
-            choices: ['view-products-sales-by-dept', 'create-new-department', 'exit'],
+            choices: ['view-products-sales-by-dept','department-profit-loss','create-new-department', 'exit'],
             filter: function (selection) {
                 if (selection === 'view-products-sales-by-dept') {
-                    return 'productSalesDept';
+                   return 'productSalesDept';
+                } else if (selection === 'department-profit-loss') {
+                    return 'profitLoss';
                 } else if (selection === 'create-new-department') {
                     return 'newDepartment';
                 } else if (selection === 'exit') {
                     return 'exitProgram';
-                } 
-                else {
+                } else {
                    console.log('ERROR: Operation Not Supported');
                     exit(1);
                 }
@@ -52,6 +53,8 @@ function promptSupervisorAction() {
         // console.log('user selected: ' + JSON.stringify(input));
         if (input.option === 'productSalesDept') {
                 displayDeptSales();
+            } else if (input.option === 'profitLoss') {
+                displayDeptProfitLoss();
             } else if (input.option === 'newDepartment') {
                 addNewDept();
             } 
@@ -77,20 +80,39 @@ function displayDeptSales() {
             res[i].department_id + " | "
             + res[i].department_name + " | "
             + formatter.format(res[i].over_head_costs)));
-
-            table = ([
-                ["DEPT ID","DEPARTMENT NAME","PRODUCT SALES"],
-                [res[i].department_id, res[i].department_name, formatter.format(res[i].over_head_costs)]
-                ],{align: ['l', 'c', 'r']})
-
+            // table = ([
+            //     ["DEPT ID","DEPARTMENT NAME","PRODUCT SALES"],
+            //     [res[i].department_id, res[i].department_name, formatter.format(res[i].over_head_costs)]
+            //     ],{align: ['l', 'c', 'r']})
             };
     });
-
-
 
     console.log("product list query: " + queryDeptSalesList.sql + '\n');
     promptSupervisorAction(); 
 };
+
+//VIEW PROFIT LOSS 
+function displayDeptProfitLoss() {
+    var queryDeptSalesList = connection.query("SELECT dep.department_id,dep.department_name,sum(pr.product_sales) as product_sales, sum(dep.over_head_costs) as over_head_costs, sum(pr.product_sales)-sum(dep.over_head_costs) as profit_loss FROM departments dep LEFT JOIN bamazon.products pr ON dep.department_name = pr.department_name GROUP BY dep.department_id,dep.department_name",
+
+      function (err, res) {
+        console.log(chalk.green('\n'+'\n'+ 'DEPARTMENT PROFIT LOSS'));
+        console.log(chalk.green('\n' + "DEPT ID | DEPARTMENT NAME | PRODUCT SALES | OVERHEAD COSTS | PROFIT LOSS"));
+         if (err) throw err;
+       for (var i = 0; i < res.length; i++) {
+          console.log(chalk.green(
+            res[i].department_id + " | "
+            + res[i].department_name + " | "
+            + formatter.format(res[i].over_head_costs)  + " | "
+            + formatter.format(res[i].product_sales)  + " | "
+            + formatter.format(res[i].profit_loss))  + " | "
+            );
+   }
+});
+    // console.log("product list query: " + queryDeptSalesList.sql + '\n');
+    promptSupervisorAction(); 
+};
+
 //ADD NEW DEPARTMENT TO PRODUCT LIST (working)
 function addNewDept() {
     inquirer.prompt([
