@@ -4,7 +4,10 @@ require("dotenv").config();
 var mysql = require("mysql");
 var chalk = require("chalk");
 // var table = require("markdown-table");
+// var table = require("console.table");
 //var table = require("text-table");
+var table = require("cli-table");
+
 var formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: "USD",
@@ -71,19 +74,45 @@ function promptSupervisorAction() {
 function displayDeptSales() {
     var queryDeptSalesList = connection.query("SELECT dep.department_id,dep.department_name,sum(pr.product_sales) as over_head_costs FROM departments dep LEFT JOIN bamazon.products pr ON dep.department_name = pr.department_name GROUP BY dep.department_id,dep.department_name",
 
-      function (err, res) {
+      function (res) {
+        var table = new Table({
+                head: ["DEPT ID | DEPARTMENT NAME | PRODUCT SALES"],
+                colWidths: []
+
+
+
         console.log(chalk.green('\n'+'\n'+ 'DEPARTMENT SALES'));
         console.log(chalk.green('\n' + "DEPT ID | DEPARTMENT NAME | PRODUCT SALES"));
          if (err) throw err;
-       for (var i = 0; i < res.length; i++) {
-          console.log(chalk.green(
-            res[i].department_id + " | "
-            + res[i].department_name + " | "
-            + formatter.format(res[i].over_head_costs)));
-            // table = ([
-            //     ["DEPT ID","DEPARTMENT NAME","PRODUCT SALES"],
-            //     [res[i].department_id, res[i].department_name, formatter.format(res[i].over_head_costs)]
-            //     ],{align: ['l', 'c', 'r']})
+
+
+        //     var table = new Table({
+        //         head: ["Transaction ID",'Type',"User Name", 'Amount',"Item","Date/Time"]
+        //       , colWidths: [10,15,15,15,20,20]
+        //     });
+        //     for (var i = 0; i < res.length; i++) {
+        //         table.push([res[i].transaction_id,res[i].transaction_type,res[i].user_name, res[i].amount,res[i].items,moment(res[i].transaction_date).format("YYYY-MM-DD HH:mm:ss")]);
+        //     }
+        //     console.log(table.toString());
+        // }
+
+            table = ([
+                head: "DEPT ID","DEPARTMENT NAME","PRODUCT SALES"
+                colWidth: [10,15,15,10,10]
+
+                for (var i = 0; i < res.length; i++) {
+                    console.log(chalk.green(
+                      res[i].department_id + " | "
+                      + res[i].department_name + " | "
+                      + formatter.format(res[i].over_head_costs)));
+                      
+                      table.push(res[i].department_id, res[i].department_name, formatter.format(res[i].over_head_costs
+
+                        )
+                ["DEPT ID","DEPARTMENT NAME","PRODUCT SALES"],
+                [)]
+                ],{align: ['l', 'c', 'r']})
+
             };
     });
 
